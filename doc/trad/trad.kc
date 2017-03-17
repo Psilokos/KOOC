@@ -1,0 +1,47 @@
+@import "trad.kh"
+
+@implementation Base {
+    @member {
+        init(char *a, int b) {
+            [self.truc] = a;
+            [self.pouet] = b;
+        }
+
+        clean() {
+            free(self->truc);
+        }
+
+        void    fct(char **a) {
+            //do things
+        }
+
+    }
+
+    @virtual int     fct2(Base *self, int a, int b) {
+        return (a * b);
+    }
+}
+
+@implementation Heir {
+    @member {
+        init(char *a, int b, double c) {
+            [parent init : a: b];
+            [self.rePouet] = 0;
+            @!(double)[self.lolilol] = c;
+        }
+
+        @virtual int    fct2(int a, int b) {
+            return (a + b);
+        }
+    }
+
+    double          fct(Base *self, int a, double b) {
+            return (a * b);
+        }
+}
+
+@implementation Pouet {
+    int zerg(void) {
+        return (123456);
+    }
+}

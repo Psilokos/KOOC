@@ -1,0 +1,82 @@
+#!/usr/bin/python3.5
+
+import sys
+
+from parser import Parser
+import cnorm
+from cnorm.passes import to_c
+
+import typer
+import ASTTransform
+
+def defineKoocFile(filename):
+    if filename[len(filename) - 3:] == '.kh':
+        return (True, False)
+    elif filename[len(filename) - 3:] == '.kc':
+        return (True, True)
+    return (False, None)
+
+def parsingStage(filename):
+    parser = Parser()
+    parser.init(filename)
+    parser.parse()
+    parser.buildSymTables()
+    parser.saveBracketsExprRef()
+    AST = parser.AST
+    parser.delete()
+    return AST
+
+def typeSystemStage(AST):
+    for parentNode in AST.brackets:
+        typer.typer(parentNode, AST.symTable, AST.types)
+
+def transformationStage(AST):
+    refList = [ importNode for _,importNode in AST.imports.items() ]
+    refList.extend([ implemNode for _,implemNode in AST.implems.items() ])
+    refList.extend([ moduleNode for _,moduleNode in AST.modules.items() ])
+    for koocNodeRef in refList:
+        koocNodeRef().transform()
+    delattr(AST, 'imports')
+    delattr(AST, 'modules')
+    delattr(AST, 'implems')
+    delattr(AST, 'brackets')
+    delattr(AST, 'symTable')
+
+def toCStage(AST, i_filename, fileType):
+    o_filename = i_filename[:len(i_filename) - 3]
+    if not fileType[1]:
+        o_filename += '.h'
+    else:
+        o_filename += '.c'
+    i = 0
+    while i < len(AST.body):
+        if isinstance(AST.body[i], cnorm.nodes.Raw) and not AST.body[i].value.startswith('#include'):
+            AST.body.pop(i)
+        else:
+            i += 1
+    if o_filename.endswith('h'):
+        defineVal = o_filename.upper()
+        defineVal = defineVal.replace(".H", "_H_")
+        AST.body.insert(0, cnorm.nodes.Raw('#ifndef ' + defineVal + '\n'))
+        AST.body.insert(1, cnorm.nodes.Raw('# define ' + defineVal + '\n'))
+        AST.body.append(cnorm.nodes.Raw('#endif /* !' + defineVal + ' */\n'))
+    o_file = open(o_filename, 'w')
+    o_file.write(str(AST.to_c()))
+    o_file.close()
+
+def main(argv = None):
+    if (argv is None):
+        argv = sys.argv
+    if len(argv) == 1 or argv[1] == '-h' or argv[1] == '--help':
+        sys.exit('usage: kooc <someFile.kh> | <someFile.kc>')
+    fileType = defineKoocFile(argv[1])
+    if not fileType[0]:
+        sys.exit('input error: file extension must be .kc or .kh')
+    AST = parsingStage(argv[1])
+    typeSystemStage(AST)
+    transformationStage(AST)
+    toCStage(AST, argv[1], fileType)
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

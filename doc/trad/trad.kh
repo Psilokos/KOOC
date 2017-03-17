@@ -1,0 +1,38 @@
+// Kooc
+@class Base {
+
+    unsigned float  pignon;
+
+    @member {
+        init(char *, int);
+
+        @virtual int     fct2(int, int);
+
+        char    *truc;
+        int     pouet;
+    }
+
+    void    fct(Base *self, char **);
+}
+
+@class Heir: Base {
+
+    @member {
+        init(char *, int, double);
+        @virtual delete();
+
+        double          fct(int, double);
+        @virtual int    fct2(int, int);
+
+        double  lolilol;
+        int     rePouet;
+    }
+}
+
+@class Pouet {
+    int         zerg(void);
+
+    @member {
+        float   rush;
+    }
+}

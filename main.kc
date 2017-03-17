@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <string.h>
+
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+@import "Test.kh"
+
+int	main(void)
+{
+	@!(void)[Test toto];
+}

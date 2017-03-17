@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <unistd.h>
+
+@import "Test.kh"
+
+@implementation	Test
+{
+
+	int	toto = 100;
+	char	l = 'l';
+	char	z;
+
+	char	return_z(void)
+	{
+		return 'Z';
+	}
+	int	return_z(){ return 'A'; }
+
+	char	return_input(char input)
+	{
+		return input;
+	}
+	char *	return_input(char input) { return 2 * input; }
+
+	char	return_modified_input(char c)
+	{
+		[Test.z] = c++;
+		[Test.z] = [Test.z]++ - 1;
+		return ([Test.z] + 1);
+	}
+	void *	return_modified_input(char c) { return c; }
+
+	char	return_input_called_in_fct(char c)
+	{
+		return (([Test.z] == [Test return_modified_input:c]) + 'l');
+	}
+
+	char	return_tertiar_result(char c)
+	{
+		return ([Test return_input_called_in_fct:c] ? ([Test.z] == [Test return_modified_input:c]) + 1 : 0);
+	}
+
+	void	my_putchar(char c)
+	{
+		write(1, &c, 1);
+	}
+
+	void	toto()
+	{
+		while ([Test.toto])
+		{
+			printf("\n%d\n", @!(int)[Test.toto]--);
+			[Test my_putchar : [Test.l]];
+			[Test my_putchar : [Test return_z]];
+			[Test.l]++;
+			[Test my_putchar : [Test return_input : [Test.l]]];
+			[Test my_putchar : [Test return_modified_input : [Test.l]]];
+			[Test my_putchar : [Test return_input_called_in_fct : [Test.l] - 1]];
+			[Test my_putchar : [Test return_tertiar_result : [Test.l]]];
+		}
+	}
+}
